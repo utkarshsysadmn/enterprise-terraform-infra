@@ -42,3 +42,9 @@ variable "private_subnet_2_cidr" {
   description = "Private Subnet 2 CIDR"
   type        = string
 }
+
+variable "tags" {
+  description = "Resource Tags"
+  type        = map(string)
+  default     = {}
+}

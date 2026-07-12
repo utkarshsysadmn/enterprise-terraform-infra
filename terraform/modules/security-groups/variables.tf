@@ -12,3 +12,9 @@ variable "vpc_id" {
   description = "VPC ID"
   type        = string
 }
+
+variable "tags" {
+  description = "Resource Tags"
+  type        = map(string)
+  default     = {}
+}

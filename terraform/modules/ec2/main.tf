@@ -5,6 +5,7 @@ resource "aws_instance" "ec2" {
   vpc_security_group_ids      = [var.security_group_id]
   key_name                    = aws_key_pair.this.key_name
   associate_public_ip_address = false
+  iam_instance_profile = var.iam_instance_profile
 
   # Root Volume
   root_block_device {

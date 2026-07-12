@@ -31,6 +31,13 @@ module "networking" {
   public_subnet_2_cidr  = "10.0.2.0/24"
   private_subnet_1_cidr = "10.0.11.0/24"
   private_subnet_2_cidr = "10.0.12.0/24"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-vpc"
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
 }
 
 module "security_groups" {
@@ -40,6 +47,27 @@ module "security_groups" {
   environment  = var.environment
 
   vpc_id = module.networking.vpc_id
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-security-group"
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+module "iam" {
+  source = "../../modules/iam"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-iam-role"
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
 }
 
 module "ec2" {
@@ -48,11 +76,19 @@ module "ec2" {
   project_name = var.project_name
   environment  = var.environment
 
-  ami_id        = data.aws_ami.amazon_linux.id
-  instance_type = var.instance_type
+  ami_id               = data.aws_ami.amazon_linux.id
+  instance_type        = var.instance_type
+  subnet_id            = module.networking.public_subnet_1_id
+  security_group_id    = module.security_groups.security_group_id
+  key_name             = var.key_name
+  public_key_path      = var.public_key_path
+  iam_instance_profile = module.iam.instance_profile_name
 
-  subnet_id         = module.networking.public_subnet_1_id
-  security_group_id = module.security_groups.security_group_id
-  key_name          = var.key_name
-  public_key_path   = var.public_key_path
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-ec2-role"
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
 }
+

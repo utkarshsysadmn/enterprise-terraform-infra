@@ -37,3 +37,15 @@ variable "public_key_path" {
   description = "Path to the SSH public key"
   type        = string
 }
+
+variable "iam_instance_profile" {
+  description = "IAM Instance Profile attached to EC2"
+  type        = string
+  default     = null
+}
+
+variable "tags" {
+  description = "Resource Tags"
+  type        = map(string)
+  default     = {}
+}
