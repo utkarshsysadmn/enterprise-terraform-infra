@@ -23,3 +23,27 @@ resource "aws_subnet" "public_subnet_2" {
     Project     = var.project_name
   }
 }
+
+resource "aws_subnet" "private_subnet_1" {
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.private_subnet_1_cidr
+  availability_zone = var.availability_zone_1
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-private-subnet-1"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+resource "aws_subnet" "private_subnet_2" {
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = var.private_subnet_2_cidr
+  availability_zone = var.availability_zone_2
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-private-subnet-2"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
