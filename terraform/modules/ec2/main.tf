@@ -5,7 +5,14 @@ resource "aws_instance" "ec2" {
   vpc_security_group_ids      = [var.security_group_id]
   key_name                    = aws_key_pair.this.key_name
   associate_public_ip_address = false
-  iam_instance_profile = var.iam_instance_profile
+  iam_instance_profile        = var.iam_instance_profile
+  user_data = templatefile(
+    "${path.module}/templates/user_data.sh.tpl",
+    {
+      project_name = var.project_name
+      environment  = var.environment
+    }
+  )
 
   # Root Volume
   root_block_device {

@@ -92,3 +92,38 @@ module "ec2" {
   }
 }
 
+module "sns" {
+
+  source = "../../modules/sns"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  email_address = "utkarshsysadmn@gmail.com"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-sns"
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+module "cloudwatch" {
+
+  source = "../../modules/cloudwatch"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  instance_id = module.ec2.instance_id
+
+  sns_topic_arn = module.sns.topic_arn
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-cloudwatch"
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
