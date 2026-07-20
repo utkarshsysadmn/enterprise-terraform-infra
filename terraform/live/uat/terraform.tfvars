@@ -6,4 +6,4 @@ environment  = "uat"
 instance_type = "t3.micro"
 
 key_name        = "enterprise-key"
-public_key_path = "/home/ubuntu/.ssh/enterprise-key.pub"
+public_key_path = "../../keys/enterprise-key.pub"
