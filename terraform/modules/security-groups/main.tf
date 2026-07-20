@@ -3,6 +3,7 @@ resource "aws_security_group" "ec2_sg" {
   description = "Security Group for EC2"
   vpc_id      = var.vpc_id
 
+  # SSH
   ingress {
     description = "SSH"
     from_port   = 22
@@ -11,6 +12,7 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # HTTP
   ingress {
     description = "HTTP"
     from_port   = 80
@@ -19,10 +21,20 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # HTTPS
   ingress {
     description = "HTTPS"
     from_port   = 443
     to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Jenkins
+  ingress {
+    description = "Jenkins"
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
