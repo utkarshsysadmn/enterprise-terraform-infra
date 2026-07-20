@@ -1,17 +1,20 @@
 pipeline {
+
     agent any
 
     options {
         ansiColor('xterm')
         timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
     environment {
-        TF_IN_AUTOMATION = 'true'
+        TF_DIR = "terraform/live/uat"
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Source') {
             steps {
                 checkout scm
             }
@@ -25,52 +28,89 @@ pipeline {
 
         stage('Terraform Format Check') {
             steps {
-                sh '''
-                cd terraform
-                terraform fmt -recursive -check
-                '''
+                dir('terraform') {
+                    sh 'terraform fmt -recursive -check'
+                }
             }
         }
 
         stage('Terraform Init') {
             steps {
-                sh '''
-                cd terraform/live/uat
-                terraform init
-                '''
+                dir("${TF_DIR}") {
+                    sh '''
+                        terraform init \
+                        -input=false
+                    '''
+                }
             }
         }
 
         stage('Terraform Validate') {
             steps {
-                sh '''
-                cd terraform/live/uat
-                terraform validate
-                '''
+                dir("${TF_DIR}") {
+                    sh '''
+                        terraform validate
+                    '''
+                }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh '''
-                cd terraform/live/uat
-                terraform plan
-                '''
+                dir("${TF_DIR}") {
+                    sh '''
+                        terraform plan \
+                        -input=false \
+                        -var-file=terraform.tfvars \
+                        -out=tfplan
+                    '''
+                }
             }
         }
+
+        stage('Manual Approval') {
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    input(
+                        message: 'Terraform Plan completed successfully.\n\nDo you want to APPLY the changes?',
+                        ok: 'Apply Terraform'
+                    )
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir("${TF_DIR}") {
+                    sh '''
+                        terraform apply \
+                        -input=false \
+                        -auto-approve \
+                        tfplan
+                    '''
+                }
+            }
+        }
+
     }
 
     post {
+
         success {
-            echo 'Terraform Validation Successful'
+            echo "========================================="
+            echo "Terraform Deployment Successful"
+            echo "========================================="
         }
 
         failure {
-            echo 'Terraform Validation Failed'
+            echo "========================================="
+            echo "Terraform Pipeline Failed"
+            echo "========================================="
         }
 
         always {
             cleanWs()
         }
+
     }
 }
