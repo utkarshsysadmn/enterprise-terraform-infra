@@ -9,6 +9,9 @@ crash.log
 *.tfvars
 *.auto.tfvars
 
+# Allow UAT tfvars for learning project
+!terraform/live/uat/terraform.tfvars
+
 # AWS Credentials
 .aws/
 
